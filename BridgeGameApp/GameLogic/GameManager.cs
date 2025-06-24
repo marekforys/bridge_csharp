@@ -33,6 +33,7 @@ namespace BridgeGameApp.GameLogic
             // Each player plays one card per trick, 13 tricks in total
             for (int trick = 0; trick < 13; trick++)
             {
+                Console.WriteLine($"\nTrick {trick + 1}:");
                 var trickCards = new List<(string Player, Card Card)>();
                 for (int i = 0; i < Players.Count; i++)
                 {
@@ -41,6 +42,7 @@ namespace BridgeGameApp.GameLogic
                     var card = player.Hand[0];
                     player.Hand.RemoveAt(0);
                     trickCards.Add((player.Name, card));
+                    Console.WriteLine($"  {player.Name}: {card}");
                 }
                 // Determine winner: highest card of the lead suit
                 var leadSuit = trickCards[0].Card.Suit;
@@ -49,11 +51,13 @@ namespace BridgeGameApp.GameLogic
                     .OrderByDescending(tc => tc.Card.Rank)
                     .First();
                 TricksWon[winningCard.Player]++;
+                Console.WriteLine($"  Winner: {winningCard.Player} with {winningCard.Card}");
             }
         }
 
         public void PrintScores()
         {
+            Console.WriteLine();
             Console.WriteLine("Tricks won:");
             foreach (var kvp in TricksWon)
                 Console.WriteLine($"{kvp.Key}: {kvp.Value}");
