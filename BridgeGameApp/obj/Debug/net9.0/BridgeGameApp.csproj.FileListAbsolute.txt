@@ -1,0 +1,15 @@
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/bin/Debug/net9.0/BridgeGameApp
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/bin/Debug/net9.0/BridgeGameApp.deps.json
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/bin/Debug/net9.0/BridgeGameApp.runtimeconfig.json
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/bin/Debug/net9.0/BridgeGameApp.dll
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/bin/Debug/net9.0/BridgeGameApp.pdb
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.GeneratedMSBuildEditorConfig.editorconfig
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.AssemblyInfoInputs.cache
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.AssemblyInfo.cs
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.csproj.CoreCompileInputs.cache
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.sourcelink.json
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.dll
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/refint/BridgeGameApp.dll
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.pdb
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/BridgeGameApp.genruntimeconfig.cache
+/Users/marek/Bridge/Bridge_csharp/bridge_csharp/BridgeGameApp/obj/Debug/net9.0/ref/BridgeGameApp.dll
