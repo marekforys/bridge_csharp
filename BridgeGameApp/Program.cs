@@ -8,7 +8,7 @@ gameManager.StartGame();
 foreach (var player in gameManager.Players)
 {
     Console.WriteLine($"{player.Name}");
-    var suits = new[] { Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades };
+    var suits = new[] { Suit.Spades, Suit.Hearts, Suit.Diamonds, Suit.Clubs };
     var sortedHand = player.Hand
         .OrderBy(card => card.Suit)
         .ThenByDescending(card => card.Rank)
