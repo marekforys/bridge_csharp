@@ -7,7 +7,7 @@ var gameManager = new GameManager(playerNames);
 gameManager.StartGame();
 foreach (var player in gameManager.Players)
 {
-    Console.WriteLine($"{player.Name}'s hand:");
+    Console.WriteLine($"{player.Name}");
     var suits = new[] { Suit.Clubs, Suit.Diamonds, Suit.Hearts, Suit.Spades };
     var sortedHand = player.Hand
         .OrderBy(card => card.Suit)
