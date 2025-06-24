@@ -38,3 +38,8 @@ biddingManager.MakeBid(BidType.Pass);                   // East: Pass
 Console.WriteLine("Bidding:");
 foreach (var bid in biddingManager.Bids)
     Console.WriteLine(bid);
+
+// After bidding, play the game and print scores
+Console.WriteLine();
+gameManager.PlayGame();
+gameManager.PrintScores();
