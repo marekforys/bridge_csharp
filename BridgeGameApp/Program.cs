@@ -26,3 +26,15 @@ foreach (var player in gameManager.Players)
     }
     Console.WriteLine();
 }
+
+// After dealing cards, simulate a bidding round
+var biddingManager = new BiddingManager(playerNames);
+biddingManager.MakeBid(BidType.Number, 1, Suit.Spades); // North: 1S
+biddingManager.MakeBid(BidType.Pass);                   // East: Pass
+biddingManager.MakeBid(BidType.Number, 2, Suit.Hearts); // South: 2H
+biddingManager.MakeBid(BidType.Pass);                   // West: Pass
+biddingManager.MakeBid(BidType.Pass);                   // North: Pass
+biddingManager.MakeBid(BidType.Pass);                   // East: Pass
+Console.WriteLine("Bidding:");
+foreach (var bid in biddingManager.Bids)
+    Console.WriteLine(bid);
