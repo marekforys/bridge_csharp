@@ -11,6 +11,34 @@ namespace BridgeGameApp.Models
             Suit = suit;
             Rank = rank;
         }
-        public override string ToString() => $"{Rank} of {Suit}";
+        public override string ToString()
+        {
+            string suitIcon = Suit switch
+            {
+                Suit.Clubs => "\u2663",    // ♣
+                Suit.Diamonds => "\u2666", // ♦
+                Suit.Hearts => "\u2665",   // ♥
+                Suit.Spades => "\u2660",   // ♠
+                _ => "?"
+            };
+            string rankSymbol = Rank switch
+            {
+                Rank.Ace => "A",
+                Rank.King => "K",
+                Rank.Queen => "Q",
+                Rank.Jack => "J",
+                Rank.Ten => "T",
+                Rank.Nine => "9",
+                Rank.Eight => "8",
+                Rank.Seven => "7",
+                Rank.Six => "6",
+                Rank.Five => "5",
+                Rank.Four => "4",
+                Rank.Three => "3",
+                Rank.Two => "2",
+                _ => "?"
+            };
+            return $"{suitIcon} {rankSymbol}";
+        }
     }
 }
