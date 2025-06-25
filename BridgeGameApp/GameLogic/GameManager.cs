@@ -28,20 +28,17 @@ namespace BridgeGameApp.GameLogic
 
         public void PlayGame()
         {
-            // Initialize tricks won
             TricksWon = Players.ToDictionary(p => p.Name, p => 0);
-            // Each player plays one card per trick, 13 tricks in total
+            int leaderIndex = 0; // Start with North (index 0)
             for (int trick = 0; trick < 13; trick++)
             {
-                Console.WriteLine($"\nTrick {trick + 1}:");
                 var trickCards = new List<(string Player, Card Card)>();
                 for (int i = 0; i < Players.Count; i++)
                 {
-                    var player = Players[i];
+                    var player = Players[(leaderIndex + i) % Players.Count];
                     var card = player.Hand[0];
                     player.Hand.RemoveAt(0);
                     trickCards.Add((player.Name, card));
-                    Console.WriteLine($"  {player.Name[0]}: {card}");
                 }
                 var leadSuit = trickCards[0].Card.Suit;
                 var winningCard = trickCards
@@ -49,7 +46,11 @@ namespace BridgeGameApp.GameLogic
                     .OrderByDescending(tc => tc.Card.Rank)
                     .First();
                 TricksWon[winningCard.Player]++;
-                Console.WriteLine($"  Winner: {winningCard.Player[0]} with {winningCard.Card}");
+                // Print trick in one line with order and winner
+                var trickLine = string.Join(" ", trickCards.Select(tc => $"{tc.Player[0]}: {tc.Card}"));
+                Console.WriteLine($"Trick {trick + 1}: {trickLine}  Winner: {winningCard.Player[0]}");
+                // Set leaderIndex for next trick
+                leaderIndex = Players.FindIndex(p => p.Name == winningCard.Player);
             }
         }
 
