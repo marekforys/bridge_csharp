@@ -47,5 +47,5 @@ foreach (var bid in biddingManager.Bids)
 
 // After bidding, play the game and print scores
 Console.WriteLine();
-gameManager.PlayGame();
+gameManager.PlayGame(biddingManager);
 gameManager.PrintScores();
