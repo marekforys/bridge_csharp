@@ -38,20 +38,18 @@ namespace BridgeGameApp.GameLogic
                 for (int i = 0; i < Players.Count; i++)
                 {
                     var player = Players[i];
-                    // For demo: play the first card in hand
                     var card = player.Hand[0];
                     player.Hand.RemoveAt(0);
                     trickCards.Add((player.Name, card));
-                    Console.WriteLine($"  {player.Name}: {card}");
+                    Console.WriteLine($"  {player.Name[0]}: {card}");
                 }
-                // Determine winner: highest card of the lead suit
                 var leadSuit = trickCards[0].Card.Suit;
                 var winningCard = trickCards
                     .Where(tc => tc.Card.Suit == leadSuit)
                     .OrderByDescending(tc => tc.Card.Rank)
                     .First();
                 TricksWon[winningCard.Player]++;
-                Console.WriteLine($"  Winner: {winningCard.Player} with {winningCard.Card}");
+                Console.WriteLine($"  Winner: {winningCard.Player[0]} with {winningCard.Card}");
             }
         }
 
@@ -60,7 +58,7 @@ namespace BridgeGameApp.GameLogic
             Console.WriteLine();
             Console.WriteLine("Tricks won:");
             foreach (var kvp in TricksWon)
-                Console.WriteLine($"{kvp.Key}: {kvp.Value}");
+                Console.WriteLine($"{kvp.Key[0]}: {kvp.Value}");
         }
     }
 }

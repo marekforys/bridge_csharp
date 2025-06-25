@@ -7,7 +7,7 @@ var gameManager = new GameManager(playerNames);
 gameManager.StartGame();
 foreach (var player in gameManager.Players)
 {
-    Console.WriteLine($"{player.Name}");
+    Console.WriteLine($"{player.Name[0]}");
     var suits = new[] { Suit.Spades, Suit.Hearts, Suit.Diamonds, Suit.Clubs };
     var sortedHand = player.Hand
         .OrderBy(card => card.Suit)
@@ -37,7 +37,13 @@ biddingManager.MakeBid(BidType.Pass);                   // North: Pass
 biddingManager.MakeBid(BidType.Pass);                   // East: Pass
 Console.WriteLine("Bidding:");
 foreach (var bid in biddingManager.Bids)
-    Console.WriteLine(bid);
+{
+    var playerInitial = bid.Player[0];
+    if (bid.Type == BidType.Pass)
+        Console.WriteLine($"{playerInitial}: Pass");
+    else
+        Console.WriteLine($"{playerInitial}: {bid.Level}{bid.Suit.ToString()[0]}");
+}
 
 // After bidding, play the game and print scores
 Console.WriteLine();
