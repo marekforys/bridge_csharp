@@ -74,31 +74,45 @@ void PrintHandVisual(List<Player> players)
         Console.WriteLine(new string(' ', centerPad) + line);
     Console.WriteLine();
     // W and E hands
-    string wPadded = westLines[0].PadLeft(maxLineLength);
-    string ePadded = eastLines[0].PadLeft(maxLineLength);
-    int wSecondIdx = wPadded.IndexOf(' ', 2);
+    int wSecondIdx = westLines[0].IndexOf(' ', 2);
     if (wSecondIdx != -1)
     {
         wSecondIdx++;
-        while (wSecondIdx < wPadded.Length && wPadded[wSecondIdx] == ' ') wSecondIdx++;
+        while (wSecondIdx < westLines[0].Length && westLines[0][wSecondIdx] == ' ') wSecondIdx++;
     }
     else
     {
-        wSecondIdx = wPadded.Length / 2;
+        wSecondIdx = westLines[0].Length / 2;
     }
-    int eSecondIdx = ePadded.IndexOf(' ', 2);
-    if (eSecondIdx != -1)
+
+    // Find the first suit line for East that has at least 2 cards
+    int eLineIdx = 0;
+    int eSecondIdx = 0;
+    for (int i = 0; i < eastLines.Length; i++)
     {
-        eSecondIdx++;
-        while (eSecondIdx < ePadded.Length && ePadded[eSecondIdx] == ' ') eSecondIdx++;
+        if (eastLines[i].Trim().Length > 2)
+        {
+            eLineIdx = i;
+            eSecondIdx = eastLines[i].IndexOf(' ', 2);
+            if (eSecondIdx != -1)
+            {
+                eSecondIdx++;
+                while (eSecondIdx < eastLines[i].Length && eastLines[i][eSecondIdx] == ' ') eSecondIdx++;
+            }
+            else
+            {
+                eSecondIdx = eastLines[i].Length / 2;
+            }
+            break;
+        }
     }
-    else
-    {
-        eSecondIdx = ePadded.Length / 2;
-    }
+
+    // Calculate padding for W and E labels to align with displayed hands
+    int wPad = maxLineLength - westLines[0].Length;
+    int eBlockStart = maxLineLength + eastPad; // Start of East hand block
     Console.WriteLine(
-        new string(' ', wSecondIdx) + "W" +
-        new string(' ', eastPad + eSecondIdx - wSecondIdx - 1) + "E");
+        new string(' ', wPad + wSecondIdx) + "W" +
+        new string(' ', eBlockStart - (wPad + wSecondIdx) + eSecondIdx) + "E");
     Console.WriteLine();
     for (int i = 0; i < 4; i++)
     {
