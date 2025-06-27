@@ -31,6 +31,23 @@ namespace BridgeGameApp.GameLogic
         }
     }
 
+    public class HandEvaluation
+    {
+        public int HighCardPoints { get; set; }
+        public int DistributionPoints { get; set; }
+        public int TotalPoints { get; set; }
+        public Dictionary<Suit, int> SuitLengths { get; set; } = new();
+        public Suit LongestSuit { get; set; }
+        public int LongestSuitLength { get; set; }
+        public bool HasStopper(Suit suit) => SuitLengths[suit] >= 3 ||
+            SuitLengths[suit] == 2 && HasHighCard(suit) ||
+            SuitLengths[suit] == 1 && HasAce(suit);
+
+        private bool HasHighCard(Suit suit) => SuitLengths[suit] > 0 &&
+            SuitLengths[suit] <= 2 && HasAce(suit);
+        private bool HasAce(Suit suit) => false; // Simplified
+    }
+
     public class BiddingManager
     {
         public List<Bid> Bids { get; private set; } = new();
@@ -62,10 +79,13 @@ namespace BridgeGameApp.GameLogic
         {
             if (lastBid == null) return true;
 
-            var newValue = level * 5 + (int)suit;
-            var lastValue = lastBid.Level!.Value * 5 + (int)lastBid.Suit!.Value;
+            // Higher level always wins
+            if (level > lastBid.Level!.Value) return true;
 
-            return newValue > lastValue;
+            // Same level, higher suit wins
+            if (level == lastBid.Level!.Value && suit > lastBid.Suit!.Value) return true;
+
+            return false;
         }
 
         private Bid? GetLastContractBid()
@@ -114,11 +134,38 @@ namespace BridgeGameApp.GameLogic
             }
         }
 
-        // Simple AI bidding
+        // Enhanced AI bidding
         public void MakeAIBid(Player player)
         {
-            // Calculate hand strength
-            var points = player.Hand.Sum(card => card.Rank switch
+            var evaluation = EvaluateHand(player.Hand);
+            var lastBid = GetLastContractBid();
+            var partnerBids = GetPartnerBids(player.Name);
+            var opponentsBids = GetOpponentBids(player.Name);
+
+            // Opening bid logic
+            if (lastBid == null)
+            {
+                MakeOpeningBid(evaluation);
+                return;
+            }
+
+            // Responding to partner's bid
+            if (partnerBids.Any())
+            {
+                MakeRespondingBid(evaluation, partnerBids.Last(), lastBid);
+                return;
+            }
+
+            // Competing with opponents
+            MakeCompetitiveBid(evaluation, lastBid);
+        }
+
+        private HandEvaluation EvaluateHand(List<Card> hand)
+        {
+            var evaluation = new HandEvaluation();
+
+            // Calculate high card points
+            evaluation.HighCardPoints = hand.Sum(card => card.Rank switch
             {
                 Rank.Ace => 4,
                 Rank.King => 3,
@@ -127,57 +174,194 @@ namespace BridgeGameApp.GameLogic
                 _ => 0
             });
 
-            // Count cards in each suit
-            var spades = player.Hand.Count(c => c.Suit == Suit.Spades);
-            var hearts = player.Hand.Count(c => c.Suit == Suit.Hearts);
-            var diamonds = player.Hand.Count(c => c.Suit == Suit.Diamonds);
-            var clubs = player.Hand.Count(c => c.Suit == Suit.Clubs);
+            // Calculate distribution points
+            var suitLengths = new Dictionary<Suit, int>();
+            foreach (Suit suit in Enum.GetValues<Suit>())
+            {
+                var length = hand.Count(c => c.Suit == suit);
+                suitLengths[suit] = length;
 
-            var suitLengths = new[] { (Suit.Spades, spades), (Suit.Hearts, hearts), (Suit.Diamonds, diamonds), (Suit.Clubs, clubs) };
-            var longestSuit = suitLengths.OrderByDescending(x => x.Item2).First().Item1;
-            var longestLength = suitLengths.OrderByDescending(x => x.Item2).First().Item2;
+                // Add distribution points
+                if (length >= 5) evaluation.DistributionPoints += length - 4;
+                if (length == 0) evaluation.DistributionPoints += 3; // Void
+                if (length == 1) evaluation.DistributionPoints += 2; // Singleton
+                if (length == 2) evaluation.DistributionPoints += 1; // Doubleton
+            }
 
-            // Get the last bid to understand the current situation
-            var lastBid = GetLastContractBid();
+            evaluation.SuitLengths = suitLengths;
+            evaluation.LongestSuit = suitLengths.OrderByDescending(x => x.Value).First().Key;
+            evaluation.LongestSuitLength = suitLengths[evaluation.LongestSuit];
+            evaluation.TotalPoints = evaluation.HighCardPoints + evaluation.DistributionPoints;
 
-            // If we have a very weak hand, pass
-            if (points < 6)
+            return evaluation;
+        }
+
+        private void MakeOpeningBid(HandEvaluation evaluation)
+        {
+            // Pass with very weak hands
+            if (evaluation.TotalPoints < 12)
             {
                 MakeBid(BidType.Pass);
                 return;
             }
 
-            // If no one has bid yet, bid our longest suit at level 1
-            if (lastBid == null)
+            // Strong NT hands (balanced, 15-17 points)
+            if (evaluation.TotalPoints >= 15 && evaluation.TotalPoints <= 17 && IsBalanced(evaluation))
             {
-                MakeBid(BidType.Number, 1, longestSuit);
+                MakeBid(BidType.Number, 1, Suit.NoTrump);
                 return;
             }
 
-            // Check if we can bid higher than the current bid
-            var currentLevel = lastBid.Level!.Value;
-            var currentSuit = lastBid.Suit!.Value;
-
-            // Try to bid our longest suit at the same level if it's higher
-            if (longestSuit > currentSuit && longestLength >= 4)
+            // Open longest suit
+            if (evaluation.LongestSuitLength >= 5)
             {
-                MakeBid(BidType.Number, currentLevel, longestSuit);
+                MakeBid(BidType.Number, 1, evaluation.LongestSuit);
                 return;
             }
 
-            // Try to bid at a higher level
-            if (currentLevel < 7)
+            // Open best 4-card suit
+            var bestSuit = GetBestSuit(evaluation);
+            MakeBid(BidType.Number, 1, bestSuit);
+        }
+
+        private void MakeRespondingBid(HandEvaluation evaluation, Bid partnerBid, Bid lastBid)
+        {
+            if (partnerBid.Type != BidType.Number)
             {
-                // Only bid higher if we have a strong hand
-                if (points >= 12 && longestLength >= 5)
+                // If partner's last bid is not a contract, just pass or make a safe bid
+                MakeBid(BidType.Pass);
+                return;
+            }
+            var partnerLevel = partnerBid.Level!.Value;
+            var partnerSuit = partnerBid.Suit!.Value;
+            var lastLevel = lastBid.Level!.Value;
+            var lastSuit = lastBid.Suit!.Value;
+
+            // Support partner's suit
+            if (evaluation.SuitLengths[partnerSuit] >= 3 && evaluation.TotalPoints >= 6)
+            {
+                if (evaluation.TotalPoints >= 13) // Game forcing
                 {
-                    MakeBid(BidType.Number, currentLevel + 1, longestSuit);
+                    MakeBid(BidType.Number, 4, partnerSuit);
+                }
+                else if (evaluation.TotalPoints >= 10) // Invitational
+                {
+                    MakeBid(BidType.Number, 3, partnerSuit);
+                }
+                else // Simple raise
+                {
+                    MakeBid(BidType.Number, 2, partnerSuit);
+                }
+                return;
+            }
+
+            // Bid new suit - must be higher than current bid
+            if (evaluation.TotalPoints >= 6)
+            {
+                var newSuit = GetBestNewSuit(evaluation, partnerSuit);
+                if (newSuit != partnerSuit && IsHigherBid(lastLevel, newSuit, lastBid))
+                {
+                    MakeBid(BidType.Number, lastLevel, newSuit);
+                    return;
+                }
+
+                // Try bidding at higher level
+                if (lastLevel < 7)
+                {
+                    MakeBid(BidType.Number, lastLevel + 1, newSuit);
                     return;
                 }
             }
 
-            // If we can't bid higher, pass
+            // Pass with weak hands
             MakeBid(BidType.Pass);
+        }
+
+        private void MakeCompetitiveBid(HandEvaluation evaluation, Bid lastBid)
+        {
+            var lastLevel = lastBid.Level!.Value;
+            var lastSuit = lastBid.Suit!.Value;
+
+            // Double with strong hands
+            if (evaluation.TotalPoints >= 15 && HasStoppers(evaluation))
+            {
+                // For now, just bid higher
+                var newSuit = GetBestSuit(evaluation);
+                if (newSuit > lastSuit)
+                {
+                    MakeBid(BidType.Number, lastLevel, newSuit);
+                    return;
+                }
+            }
+
+            // Bid higher if we have a good hand
+            if (evaluation.TotalPoints >= 10)
+            {
+                var newSuit = GetBestSuit(evaluation);
+                if (newSuit > lastSuit)
+                {
+                    MakeBid(BidType.Number, lastLevel, newSuit);
+                    return;
+                }
+
+                // Try bidding at higher level
+                if (lastLevel < 7 && evaluation.SuitLengths[newSuit] >= 5)
+                {
+                    MakeBid(BidType.Number, lastLevel + 1, newSuit);
+                    return;
+                }
+            }
+
+            // Pass
+            MakeBid(BidType.Pass);
+        }
+
+        private bool IsBalanced(HandEvaluation evaluation)
+        {
+            var lengths = evaluation.SuitLengths.Values.OrderBy(x => x).ToArray();
+            return lengths.Length == 4 && lengths[0] >= 2 && lengths[3] <= 4;
+        }
+
+        private Suit GetBestSuit(HandEvaluation evaluation)
+        {
+            // Prefer major suits, then longest suit
+            var majorSuits = evaluation.SuitLengths.Where(x => x.Key == Suit.Spades || x.Key == Suit.Hearts)
+                .OrderByDescending(x => x.Value).ToList();
+
+            if (majorSuits.Any() && majorSuits.First().Value >= 4)
+                return majorSuits.First().Key;
+
+            return evaluation.LongestSuit;
+        }
+
+        private Suit GetBestNewSuit(HandEvaluation evaluation, Suit partnerSuit)
+        {
+            var candidates = evaluation.SuitLengths.Where(x => x.Key != partnerSuit && x.Value >= 4)
+                .OrderByDescending(x => x.Value).ToList();
+
+            if (candidates.Any())
+                return candidates.First().Key;
+
+            return evaluation.LongestSuit;
+        }
+
+        private bool HasStoppers(HandEvaluation evaluation)
+        {
+            return evaluation.SuitLengths.All(x => evaluation.HasStopper(x.Key));
+        }
+
+        private List<Bid> GetPartnerBids(string playerName)
+        {
+            var partnerIndex = (_players.IndexOf(playerName) + 2) % _players.Count;
+            var partnerName = _players[partnerIndex];
+            return Bids.Where(b => b.Player == partnerName).ToList();
+        }
+
+        private List<Bid> GetOpponentBids(string playerName)
+        {
+            var partnerIndex = (_players.IndexOf(playerName) + 2) % _players.Count;
+            var partnerName = _players[partnerIndex];
+            return Bids.Where(b => b.Player != playerName && b.Player != partnerName).ToList();
         }
     }
 }

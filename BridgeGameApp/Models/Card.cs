@@ -1,6 +1,6 @@
 namespace BridgeGameApp.Models
 {
-    public enum Suit { Clubs, Diamonds, Hearts, Spades }
+    public enum Suit { Clubs, Diamonds, Hearts, Spades, NoTrump }
     public enum Rank { Two = 2, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace }
     public class Card
     {
@@ -19,6 +19,7 @@ namespace BridgeGameApp.Models
                 Suit.Diamonds => "\u2666", // ♦
                 Suit.Hearts => "\u2665",   // ♥
                 Suit.Spades => "\u2660",   // ♠
+                Suit.NoTrump => "NT",
                 _ => "?"
             };
             string rankSymbol = Rank switch
