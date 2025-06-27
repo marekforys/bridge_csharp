@@ -112,7 +112,7 @@ void PrintHandVisual(List<Player> players)
     int eBlockStart = maxLineLength + eastPad; // Start of East hand block
     Console.WriteLine(
         new string(' ', wPad + wSecondIdx) + "W" +
-        new string(' ', eBlockStart - (wPad + wSecondIdx) + eSecondIdx) + "E");
+        new string(' ', eBlockStart - (wPad + wSecondIdx + 1) + eSecondIdx) + "E");
     Console.WriteLine();
     for (int i = 0; i < 4; i++)
     {
