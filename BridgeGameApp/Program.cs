@@ -58,10 +58,10 @@ void PrintHandVisual(List<Player> players)
 
     // N hand
     Console.WriteLine();
-    Console.WriteLine(new string(' ', centerLabelPad) + "N");
+    Console.WriteLine(new string(' ', centerPad + (maxLineLength - 1) / 2) + "N");
     Console.WriteLine();
     foreach (var line in northLines)
-        Console.WriteLine(new string(' ', centerLabelPad) + line);
+        Console.WriteLine(new string(' ', centerPad) + line);
     Console.WriteLine();
     Console.WriteLine($"{Center("W", maxLineLength)}{new string(' ', eastPad)}{Center("E", maxLineLength)}");
     Console.WriteLine();
@@ -72,10 +72,11 @@ void PrintHandVisual(List<Player> players)
         Console.WriteLine($"{w.PadLeft(maxLineLength)}{new string(' ', eastPad)}{e.PadLeft(maxLineLength)}");
     }
     Console.WriteLine();
-    Console.WriteLine(new string(' ', centerLabelPad) + "S");
+    // S hand
+    Console.WriteLine(new string(' ', centerPad + (maxLineLength - 1) / 2) + "S");
     Console.WriteLine();
     foreach (var line in southLines)
-        Console.WriteLine(new string(' ', centerLabelPad) + line);
+        Console.WriteLine(new string(' ', centerPad) + line);
     Console.WriteLine();
 }
 
