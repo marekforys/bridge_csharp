@@ -5,27 +5,76 @@ using BridgeGameApp.Models;
 var playerNames = new List<string> { "North", "East", "South", "West" };
 var gameManager = new GameManager(playerNames);
 gameManager.StartGame();
-foreach (var player in gameManager.Players)
+void PrintHandVisual(List<Player> players)
 {
-    Console.WriteLine($"{player.Name[0]}");
     var suits = new[] { Suit.Spades, Suit.Hearts, Suit.Diamonds, Suit.Clubs };
-    var sortedHand = player.Hand
-        .OrderBy(card => card.Suit)
-        .ThenByDescending(card => card.Rank)
-        .ToList();
-    foreach (var suit in suits)
+    var north = players.First(p => p.Name == "North");
+    var south = players.First(p => p.Name == "South");
+    var west = players.First(p => p.Name == "West");
+    var east = players.First(p => p.Name == "East");
+
+    string[] FormatHandLines(Player p)
     {
-        var cardsInSuit = sortedHand.Where(card => card.Suit == suit).ToList();
-        if (cardsInSuit.Count > 0)
+        var sortedHand = p.Hand
+            .OrderBy(card => card.Suit)
+            .ThenByDescending(card => card.Rank)
+            .ToList();
+        int maxCardsInSuit = suits.Max(suit => players.Max(pl => pl.Hand.Count(c => c.Suit == suit)));
+        return suits.Select(suit =>
         {
-            Console.Write($"{cardsInSuit[0].ToString().Split(' ')[0]}: "); // Print suit icon
-            foreach (var card in cardsInSuit)
-                Console.Write($"{card.ToString().Split(' ')[1]} "); // Print rank symbol
-            Console.WriteLine();
-        }
+            var cards = sortedHand.Where(card => card.Suit == suit).ToList();
+            var suitIcon = suit switch
+            {
+                Suit.Spades => "\u2660", // ♠
+                Suit.Hearts => "\u2665", // ♥
+                Suit.Diamonds => "\u2666", // ♦
+                Suit.Clubs => "\u2663", // ♣
+                _ => "?"
+            };
+            string cardStr = cards.Count == 0 ? "" : string.Join(" ", cards.Select(card => card.ToString().Split(' ')[1]));
+            return (suitIcon + (cardStr.Length > 0 ? " " + cardStr : "")).PadRight(2 + maxCardsInSuit * 2);
+        }).ToArray();
+    }
+
+    var northLines = FormatHandLines(north);
+    var southLines = FormatHandLines(south);
+    var westLines = FormatHandLines(west);
+    var eastLines = FormatHandLines(east);
+
+    int maxLineLength = new[] { northLines, southLines, westLines, eastLines }
+        .SelectMany(lines => lines)
+        .Where(line => !string.IsNullOrWhiteSpace(line))
+        .Select(line => line.Length)
+        .DefaultIfEmpty(0)
+        .Max();
+
+    string Center(string s, int width) => s.PadLeft((width + s.Length) / 2).PadRight(width);
+
+    int totalWidth = maxLineLength * 2 + 3; // 3 for spacing between W and E
+    int centerPad = maxLineLength + 2; // Pad N and S to align with center between W and E
+    int eastPad = maxLineLength + 6; // Increase padding to create an empty square at the center
+    int centerLabelPad = totalWidth / 2;
+
+    Console.WriteLine();
+    Console.WriteLine(new string(' ', centerLabelPad) + "N");
+    foreach (var line in northLines)
+        Console.WriteLine(new string(' ', centerLabelPad) + line);
+    Console.WriteLine();
+    Console.WriteLine($"{Center("W", maxLineLength)}{new string(' ', eastPad)}{Center("E", maxLineLength)}");
+    for (int i = 0; i < 4; i++)
+    {
+        string w = i < westLines.Length ? westLines[i] : "";
+        string e = i < eastLines.Length ? eastLines[i] : "";
+        Console.WriteLine($"{w.PadLeft(maxLineLength)}{new string(' ', eastPad)}{e.PadLeft(maxLineLength)}");
     }
     Console.WriteLine();
+    Console.WriteLine(new string(' ', centerLabelPad) + "S");
+    foreach (var line in southLines)
+        Console.WriteLine(new string(' ', centerLabelPad) + line);
+    Console.WriteLine();
 }
+
+PrintHandVisual(gameManager.Players);
 
 // After dealing cards, simulate a bidding round
 var biddingManager = new BiddingManager(playerNames);
