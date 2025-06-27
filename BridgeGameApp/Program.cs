@@ -141,23 +141,48 @@ void PrintHandVisual(List<Player> players)
 
 PrintHandVisual(gameManager.Players);
 
-// After dealing cards, simulate a bidding round
+// Enhanced bidding with AI players
 var biddingManager = new BiddingManager(playerNames);
-biddingManager.MakeBid(BidType.Number, 1, Suit.Spades); // North: 1S
-biddingManager.MakeBid(BidType.Pass);                   // East: Pass
-biddingManager.MakeBid(BidType.Number, 2, Suit.Hearts); // South: 2H
-biddingManager.MakeBid(BidType.Pass);                   // West: Pass
-biddingManager.MakeBid(BidType.Pass);                   // North: Pass
-biddingManager.MakeBid(BidType.Pass);                   // East: Pass
-Console.WriteLine("Bidding:");
-foreach (var bid in biddingManager.Bids)
+
+Console.WriteLine("Starting bidding phase...\n");
+
+// Simulate AI bidding until bidding is over
+while (!biddingManager.IsBiddingOver())
 {
-    var playerInitial = bid.Player[0];
-    if (bid.Type == BidType.Pass)
-        Console.WriteLine($"{playerInitial}: Pass");
-    else
-        Console.WriteLine($"{playerInitial}: {bid.Level}{bid.Suit.ToString()[0]}");
+    var currentPlayer = gameManager.Players.First(p => p.Name == biddingManager.CurrentPlayer);
+
+    // Make AI bid
+    biddingManager.MakeAIBid(currentPlayer);
+
+    // Print the last bid
+    var lastBid = biddingManager.Bids.Last();
+    var playerInitial = lastBid.Player[0];
+
+    Console.Write($"{playerInitial}: ");
+    switch (lastBid.Type)
+    {
+        case BidType.Pass:
+            Console.WriteLine("Pass");
+            break;
+        case BidType.Number:
+            var suitSymbol = lastBid.Suit!.Value switch
+            {
+                Suit.Spades => "♠",
+                Suit.Hearts => "♥",
+                Suit.Diamonds => "♦",
+                Suit.Clubs => "♣",
+                _ => "?"
+            };
+            Console.WriteLine($"{lastBid.Level}{suitSymbol}");
+            break;
+    }
+
+    // Add a small delay to make bidding more readable
+    Thread.Sleep(500);
 }
+
+Console.WriteLine();
+biddingManager.PrintBiddingHistory();
 
 // After bidding, play the game and print scores
 Console.WriteLine();
