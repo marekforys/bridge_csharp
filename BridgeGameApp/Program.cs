@@ -54,13 +54,17 @@ void PrintHandVisual(List<Player> players)
     int centerPad = maxLineLength + 2; // Pad N and S to align with center between W and E
     int eastPad = maxLineLength + 6; // Increase padding to create an empty square at the center
     int centerLabelPad = totalWidth / 2;
+    int labelCol = 2 + (maxLineLength > 2 ? 2 : 0); // Column for the second card (after suit icon and first card)
 
+    // N hand
     Console.WriteLine();
     Console.WriteLine(new string(' ', centerLabelPad) + "N");
+    Console.WriteLine();
     foreach (var line in northLines)
         Console.WriteLine(new string(' ', centerLabelPad) + line);
     Console.WriteLine();
     Console.WriteLine($"{Center("W", maxLineLength)}{new string(' ', eastPad)}{Center("E", maxLineLength)}");
+    Console.WriteLine();
     for (int i = 0; i < 4; i++)
     {
         string w = i < westLines.Length ? westLines[i] : "";
@@ -69,6 +73,7 @@ void PrintHandVisual(List<Player> players)
     }
     Console.WriteLine();
     Console.WriteLine(new string(' ', centerLabelPad) + "S");
+    Console.WriteLine();
     foreach (var line in southLines)
         Console.WriteLine(new string(' ', centerLabelPad) + line);
     Console.WriteLine();
