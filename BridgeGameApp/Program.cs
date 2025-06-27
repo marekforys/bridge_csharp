@@ -57,13 +57,48 @@ void PrintHandVisual(List<Player> players)
     int labelCol = 2 + (maxLineLength > 2 ? 2 : 0); // Column for the second card (after suit icon and first card)
 
     // N hand
+    int nSecondIdx = northLines[0].IndexOf(' ', 2);
+    if (nSecondIdx != -1)
+    {
+        nSecondIdx++;
+        while (nSecondIdx < northLines[0].Length && northLines[0][nSecondIdx] == ' ') nSecondIdx++;
+    }
+    else
+    {
+        nSecondIdx = northLines[0].Length / 2;
+    }
     Console.WriteLine();
-    Console.WriteLine(new string(' ', centerPad + (maxLineLength - 1) / 2) + "N");
+    Console.WriteLine(new string(' ', centerPad + nSecondIdx) + "N");
     Console.WriteLine();
     foreach (var line in northLines)
         Console.WriteLine(new string(' ', centerPad) + line);
     Console.WriteLine();
-    Console.WriteLine($"{Center("W", maxLineLength)}{new string(' ', eastPad)}{Center("E", maxLineLength)}");
+    // W and E hands
+    string wPadded = westLines[0].PadLeft(maxLineLength);
+    string ePadded = eastLines[0].PadLeft(maxLineLength);
+    int wSecondIdx = wPadded.IndexOf(' ', 2);
+    if (wSecondIdx != -1)
+    {
+        wSecondIdx++;
+        while (wSecondIdx < wPadded.Length && wPadded[wSecondIdx] == ' ') wSecondIdx++;
+    }
+    else
+    {
+        wSecondIdx = wPadded.Length / 2;
+    }
+    int eSecondIdx = ePadded.IndexOf(' ', 2);
+    if (eSecondIdx != -1)
+    {
+        eSecondIdx++;
+        while (eSecondIdx < ePadded.Length && ePadded[eSecondIdx] == ' ') eSecondIdx++;
+    }
+    else
+    {
+        eSecondIdx = ePadded.Length / 2;
+    }
+    Console.WriteLine(
+        new string(' ', wSecondIdx) + "W" +
+        new string(' ', eastPad + eSecondIdx - wSecondIdx - 1) + "E");
     Console.WriteLine();
     for (int i = 0; i < 4; i++)
     {
@@ -73,7 +108,17 @@ void PrintHandVisual(List<Player> players)
     }
     Console.WriteLine();
     // S hand
-    Console.WriteLine(new string(' ', centerPad + (maxLineLength - 1) / 2) + "S");
+    int sSecondIdx = southLines[0].IndexOf(' ', 2);
+    if (sSecondIdx != -1)
+    {
+        sSecondIdx++;
+        while (sSecondIdx < southLines[0].Length && southLines[0][sSecondIdx] == ' ') sSecondIdx++;
+    }
+    else
+    {
+        sSecondIdx = southLines[0].Length / 2;
+    }
+    Console.WriteLine(new string(' ', centerPad + sSecondIdx) + "S");
     Console.WriteLine();
     foreach (var line in southLines)
         Console.WriteLine(new string(' ', centerPad) + line);
