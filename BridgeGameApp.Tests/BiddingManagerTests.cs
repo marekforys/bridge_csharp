@@ -33,10 +33,12 @@ namespace BridgeGameApp.Tests
         {
             var players = new List<string> { "North", "East", "South", "West" };
             var manager = new BiddingManager(players);
-            manager.MakeBid(BidType.Pass);
-            manager.MakeBid(BidType.Pass);
-            manager.MakeBid(BidType.Pass);
-            manager.MakeBid(BidType.Pass);
+            manager.MakeBid(BidType.Pass); // North
+            manager.MakeBid(BidType.Pass); // East
+            manager.MakeBid(BidType.Number, 1, Suit.Clubs); // South
+            manager.MakeBid(BidType.Pass); // West
+            manager.MakeBid(BidType.Pass); // North
+            manager.MakeBid(BidType.Pass); // East
             Assert.True(manager.IsBiddingOver());
         }
 

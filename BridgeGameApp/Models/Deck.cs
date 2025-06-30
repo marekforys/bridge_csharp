@@ -11,8 +11,11 @@ namespace BridgeGameApp.Models
         {
             cards = new List<Card>();
             foreach (Suit suit in Enum.GetValues(typeof(Suit)))
+            {
+                if (suit == Suit.NoTrump) continue;
                 foreach (Rank rank in Enum.GetValues(typeof(Rank)))
                     cards.Add(new Card(suit, rank));
+            }
         }
         public void Shuffle()
         {

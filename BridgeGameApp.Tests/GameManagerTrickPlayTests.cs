@@ -14,7 +14,9 @@ namespace BridgeGameApp.Tests
             var names = new List<string> { "North", "East", "South", "West" };
             var manager = new GameManager(names);
             manager.StartGame();
-            manager.PlayGame();
+            var biddingManager = new BiddingManager(names);
+            biddingManager.Bids.Add(new Bid(BidType.Number, "North", 1, Suit.Clubs));
+            manager.PlayGame(biddingManager);
             int totalTricks = manager.TricksWon.Values.Sum();
             Assert.Equal(13, totalTricks);
         }
@@ -25,7 +27,9 @@ namespace BridgeGameApp.Tests
             var names = new List<string> { "North", "East", "South", "West" };
             var manager = new GameManager(names);
             manager.StartGame();
-            manager.PlayGame();
+            var biddingManager = new BiddingManager(names);
+            biddingManager.Bids.Add(new Bid(BidType.Number, "North", 1, Suit.Clubs));
+            manager.PlayGame(biddingManager);
             var trickWinners = manager.TricksWon.Keys.OrderBy(x => x).ToList();
             var playerNames = names.OrderBy(x => x).ToList();
             Assert.Equal(playerNames, trickWinners);
@@ -37,7 +41,9 @@ namespace BridgeGameApp.Tests
             var names = new List<string> { "North", "East", "South", "West" };
             var manager = new GameManager(names);
             manager.StartGame();
-            manager.PlayGame();
+            var biddingManager = new BiddingManager(names);
+            biddingManager.Bids.Add(new Bid(BidType.Number, "North", 1, Suit.Clubs));
+            manager.PlayGame(biddingManager);
             Assert.All(manager.Players, p => Assert.Empty(p.Hand));
         }
     }
